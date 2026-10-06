@@ -1,0 +1,12 @@
+{
+  "name": "BIMO",
+  "short_name": "BIMO",
+  "description": "Turn SUD Life Benefit Illustrations into clean, customer-ready images.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0B2E5E",
+  "theme_color": "#0B2E5E",
+  "icons": [
+    { "src": "assets/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
