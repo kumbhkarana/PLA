@@ -1,20 +1,6 @@
-/* BIMO configuration — users, products and BI portal links. */
+/* BIMO configuration — product catalogue. Agent logins live on the server (server/users.json). */
 window.BIMO_CONFIG = {
   appName: 'BIMO',
-
-  // BI portal (SUD Life Sales Illustration)
-  portal: {
-    productPage: 'https://si.sudlife.in/Salesillustration/ProductPage.aspx',
-    inputUrl: function (productId) {
-      return 'https://si.sudlife.in/Salesillustration/Input.aspx?ProductId=' + productId;
-    }
-  },
-
-  // Demo agents. "username" is the agent's name, "code" is the password.
-  // NOTE: client-side credentials are for demo only — move to a server before production.
-  users: [
-    { username: 'Karan', code: '12345', name: 'Karan', tier: 'Platinum Agent' }
-  ],
 
   // Product catalogue, as listed on the SUD Life product page.
   categories: [

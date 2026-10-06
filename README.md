@@ -1,43 +1,64 @@
 # BIMO
 
-BIMO helps SUD Life agents turn a Benefit Illustration (BI) into a clean, one-page image that shows a customer only what they need to know.
+BIMO helps SUD Life agents generate a Benefit Illustration (BI) **inside the app** and turn it into a clean, one-page image that shows the customer only what they need to know.
 
 ## Flow
 
-**Login → Welcome → Select product → Continue → SUD Life BI portal → fill details → Generate BI → upload the PDF → clean illustration image**
+**Login → Welcome → Select product → Continue → fill details in BIMO → Generate BI → illustration image**
 
-1. **Login.** The username is the agent's name and the password is their code. Demo: `Karan` / `12345`.
+1. **Login.** The username is the agent's name and the password is their code. Demo: `Karan` / `12345`. Logins are checked on the server.
 2. **Home.** Shows "Welcome, *Name*" with the agent's tier badge (Platinum Agent), followed by all 35 SUD Life products, grouped by category and searchable.
-3. **Continue.** Opens the product's page on the BI portal (`si.sudlife.in/Salesillustration/Input.aspx?ProductId=…`) in a new tab. The agent fills in the customer's details there and downloads the BI PDF.
-4. **Upload.** The agent uploads that PDF to BIMO. BIMO reads it on the device (nothing is sent to a server) and picks out the main figures: customer, age, gender, plan option, policy term, premium paying term, premium, life cover, yearly income and maturity benefit.
-5. **Illustration.** BIMO builds a branded card: what the customer pays, what they get back (and how many times their premiums that is), the key figures as tiles, a timeline of the policy, and the agent's name. The agent can correct any figure that was missed. **Download image** saves a PNG. **Share** sends it through the phone's share sheet, for example to WhatsApp.
+3. **Form.** BIMO builds the product's form from the SUD Life Sales Illustration system: life assured, proposer, benefit option, distribution channel, policy term, premium paying term, mode, premium and age proof. Dropdowns follow the portal's own rules; for example, the PPT list depends on the chosen policy term.
+4. **Generate BI.** BIMO sends the inputs to the portal's calculation engine. Validation messages (e.g. "Minimum Sum Assured is 3,78,000") are shown on the form.
+5. **Illustration.** The official figures are turned into a branded card showing:
+   - what the customer pays against what they could receive (guaranteed, and at the 4% and 8% assumed rates)
+   - life cover, guaranteed maturity and policy term
+   - a pay/grow/income timeline
+   - the agent's name
 
-> Why a new tab and not inside BIMO? The SUD Life portal doesn't allow itself to be embedded in other apps (`X-Frame-Options: SAMEORIGIN`, `frame-ancestors 'none'`), so BIMO opens it in its own tab and the PDF is brought back in by upload.
+   **Download image** saves a PNG. **Share** opens the phone's share sheet (e.g. WhatsApp). **Official BI (PDF)** downloads the portal's full BI.
+
+## How it works
+
+```
+Phone (BIMO app)  ──►  BIMO server (Node)  ──►  si.sudlife.in  (Sales Illustration engine)
+   form + image          login, sessions,         calculates premium, sum assured
+   (html2canvas)         portal relay, BI parser  and the year-wise benefit table
+```
+
+The browser can't call si.sudlife.in directly (it allows no cross-site requests and can't be embedded in another app). The small BIMO server keeps one portal session per logged-in agent and makes the calls the portal's own page would make:
+- product lookups: terms, modes, options
+- the encrypted validation call
+- `GenerateBIPDF`
+
+`server/biParser.js` reads the returned BI, including its multi-level year-wise table, and works out the summary figures.
 
 ## Run it
 
-It is a static web app with no build step:
+Node 18 or newer, with no dependencies to install:
 
 ```bash
-python3 -m http.server 8080
-# open http://localhost:8080
+npm start              # http://localhost:8080   (PORT=3000 npm start to change)
 ```
 
-It can be hosted on any static host (GitHub Pages, Netlify, Firebase Hosting). On a phone, use **Add to Home Screen** to install it like an app. A service worker lets it open offline.
+Deploy it on any Node host (Render, Railway, a VPS, Azure App Service, …) and serve it over HTTPS. On a phone, use **Add to Home Screen** to install it like an app.
+
+If your network routes outbound traffic through a proxy, start it with `NODE_USE_ENV_PROXY=1` (Node 22.21 or newer).
 
 ## Customise
 
 | What | Where |
 |---|---|
-| Agents (name, code, tier) | `js/config.js` → `users` |
-| Products / BI links | `js/config.js` → `categories`, `portal` |
+| Agents (name, code, tier) | `server/users.json` (or point `BIMO_USERS` at another file) |
+| Products shown on Home | `js/config.js` → `categories` |
 | Brand colours | `css/styles.css` → `:root` variables (`--brand`, `--accent`, …) |
-| Logo | replace `assets/logo.svg` (the same file is used everywhere) |
-| Illustration layout | `renderIllustration()` in `js/app.js`, `.illus*` styles |
-| PDF field labels | `FIELDS` in `js/parser.js` |
+| Logo | replace `assets/logo.svg` |
+| Illustration layout | `renderIllustration()` in `js/app.js`, `.illus*` and `.bar*` styles |
+| Summary figures | `summarize()` in `server/biParser.js` |
 
 ## Notes
 
-- Logins are checked in the browser, so they are for demo use only. Before real use, move authentication to a server.
-- The PDF reader matches labels such as "Policy Term" and "Annualized Premium". If a product's BI uses different wording, add the label to `FIELDS` in `js/parser.js`. After an upload, `window.__bimoLastParse.rawText` in the browser console shows the text BIMO extracted.
-- Libraries are stored in `vendor/`: pdf.js 3.11.174 and html2canvas 1.4.1.
+- **Tested end to end with SUD Life Fortune Plus.** The figures match the official BI exactly, including annual and monthly modes and the portal's validation errors. Other traditional (non-linked) products use the same engine and should work, but each needs a check. ULIPs (fund choice), annuity products and underwriting-extra fields (EMR / flat extra) are not supported in the form yet.
+- BIMO depends on the portal's internal page calls. If SUD Life changes its BI page, `server/portal.js` may need an update. For production, ask SUD Life for official API access.
+- The portal has bot protection. BIMO reuses one portal session per agent and retries once if blocked, but very heavy use from a single server IP could still be throttled.
+- Agent codes are stored in plain text in `server/users.json`. Replace this with the company's agent login system before rollout.

@@ -1,0 +1,13 @@
+{
+  "name": "bimo",
+  "version": "2.0.0",
+  "private": true,
+  "description": "BIMO — generate SUD Life Benefit Illustrations and turn them into clean, shareable images.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

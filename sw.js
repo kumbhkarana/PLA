@@ -1,9 +1,8 @@
 /* BIMO service worker — caches the app shell so it opens offline. */
-const CACHE = 'bimo-v1';
+const CACHE = 'bimo-v2';
 const ASSETS = [
   './', './index.html', './css/styles.css', './manifest.webmanifest', './assets/logo.svg',
-  './js/config.js', './js/parser.js', './js/app.js',
-  './vendor/pdf.min.js', './vendor/pdf.worker.min.js', './vendor/html2canvas.min.js'
+  './js/config.js', './js/app.js', './vendor/html2canvas.min.js'
 ];
 
 self.addEventListener('install', (e) => {
@@ -19,7 +18,8 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/')) return;
   // Network first so updates show up, cache as offline fallback.
   e.respondWith(
     fetch(e.request)

@@ -68,41 +68,54 @@
     </div>
   </section>
 
-  <!-- 3. GENERATE BI + UPLOAD -->
-  <section id="screen-generate" class="screen" hidden>
+  <!-- 3. BI FORM -->
+  <section id="screen-form" class="screen" hidden>
     <header class="topbar">
       <button class="btn-link back" data-action="home">&larr; Products</button>
       <div class="topbar-brand"><img src="assets/logo.svg" alt=""><span>BIMO</span></div>
     </header>
 
     <main class="content">
-      <p class="eyebrow">Selected product</p>
+      <p class="eyebrow">Generate Benefit Illustration</p>
       <h2 class="product-title" data-bind="productName"></h2>
 
-      <ol class="steps">
-        <li class="step done"><b>Fill customer details</b><span>Complete the form on the SUD Life BI portal that just opened.</span></li>
-        <li class="step"><b>Generate &amp; download the BI</b><span>Tap “Generate BI” on the portal and save the PDF to your phone.</span></li>
-        <li class="step"><b>Upload it here</b><span>BIMO turns it into a clean one-page illustration for your customer.</span></li>
-      </ol>
+      <div id="form-loading" class="status busy">Loading product details…</div>
 
-      <button id="btn-open-portal" class="btn btn-outline btn-block">Open BI portal again</button>
+      <form id="bi-form" novalidate hidden>
+        <fieldset class="card">
+          <legend>Life assured</legend>
+          <div class="grid-form">
+            <label class="field"><span>First name</span><input name="firstName" type="text" autocomplete="off" required></label>
+            <label class="field"><span>Last name</span><input name="lastName" type="text" autocomplete="off"></label>
+            <label class="field"><span>Date of birth <em class="age" data-age-for="dob"></em></span><input name="dob" type="date" required></label>
+            <label class="field"><span>Gender</span><select name="gender" required></select></label>
+          </div>
+          <label class="check"><input type="checkbox" name="proposerSame" checked> Proposer is the same as life assured</label>
+          <div class="grid-form" id="proposer-fields" hidden>
+            <label class="field"><span>Proposer first name</span><input name="pFirstName" type="text" autocomplete="off"></label>
+            <label class="field"><span>Proposer last name</span><input name="pLastName" type="text" autocomplete="off"></label>
+            <label class="field"><span>Proposer date of birth <em class="age" data-age-for="pDob"></em></span><input name="pDob" type="date"></label>
+            <label class="field"><span>Proposer gender</span><select name="pGender"></select></label>
+          </div>
+        </fieldset>
 
-      <label id="dropzone" class="dropzone" for="bi-file">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l5 5h-3v6h-4V8H7zm-7 14h14v4H5z"/></svg>
-        <b>Upload BI PDF</b>
-        <span>Tap to choose, or drop the file here</span>
-        <input id="bi-file" type="file" accept="application/pdf,.pdf" hidden>
-      </label>
-      <p id="parse-status" class="status" role="status" hidden></p>
+        <fieldset class="card">
+          <legend>Plan details</legend>
+          <div class="grid-form" id="plan-fields"></div>
+        </fieldset>
 
-      <button class="btn-link manual" data-action="manual">No PDF? Enter the figures manually</button>
+        <div id="form-error" class="status error" role="alert" hidden></div>
+
+        <button type="submit" id="btn-generate" class="btn btn-accent btn-block">Generate BI</button>
+        <p class="fine">Figures are calculated live by the SUD Life Sales Illustration system.</p>
+      </form>
     </main>
   </section>
 
   <!-- 4. ILLUSTRATION -->
   <section id="screen-result" class="screen" hidden>
     <header class="topbar">
-      <button class="btn-link back" data-action="generate">&larr; Back</button>
+      <button class="btn-link back" data-action="form">&larr; Edit details</button>
       <div class="topbar-brand"><img src="assets/logo.svg" alt=""><span>BIMO</span></div>
     </header>
 
@@ -114,22 +127,16 @@
       <div class="actions">
         <button id="btn-download" class="btn btn-accent">Download image</button>
         <button id="btn-share" class="btn btn-primary" hidden>Share</button>
+        <button id="btn-pdf" class="btn btn-outline" hidden>Official BI (PDF)</button>
         <button class="btn btn-outline" data-action="home">New BI</button>
       </div>
-
-      <details class="editor" id="editor">
-        <summary>Check &amp; edit details <span class="muted" id="filled-note"></span></summary>
-        <form id="details-form" class="grid-form"></form>
-      </details>
     </main>
   </section>
 
   <div id="toast" class="toast" role="status" hidden></div>
 
-  <script src="vendor/pdf.min.js"></script>
   <script src="vendor/html2canvas.min.js"></script>
   <script src="js/config.js"></script>
-  <script src="js/parser.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
