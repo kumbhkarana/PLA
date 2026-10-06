@@ -35,11 +35,19 @@ The browser can't call si.sudlife.in directly (it allows no cross-site requests 
 
 ## Run it
 
-Node 18 or newer, with no dependencies to install:
+> **BIMO must be opened through its server.** Opening `index.html` directly, or hosting the files on a static host such as GitHub Pages, will not work. Login and BI generation both run on the server, so the login screen will say "BIMO server is not running".
 
-```bash
-npm start              # http://localhost:8080   (PORT=3000 npm start to change)
-```
+1. Install [Node.js](https://nodejs.org) (version 18 or newer).
+2. Download this repository and open a terminal in its folder.
+3. Run:
+
+   ```bash
+   npm start
+   ```
+
+4. Open **http://localhost:8080** in your browser and log in with `Karan` / `12345`.
+
+To use it on a phone on the same Wi-Fi, open `http://<your-computer's-IP>:8080`. To use a different port, run `PORT=3000 npm start`.
 
 Deploy it on any Node host (Render, Railway, a VPS, Azure App Service, …) and serve it over HTTPS. On a phone, use **Add to Home Screen** to install it like an app.
 

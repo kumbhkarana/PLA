@@ -74,15 +74,25 @@
     window.scrollTo(0, 0);
   }
 
+  var NO_SERVER = 'BIMO server is not running. Open BIMO from its server address (start it with “npm start”) instead of opening the file directly.';
+
   async function api(path, body) {
-    var res = await fetch('/api/' + path, {
-      method: body === undefined ? 'GET' : 'POST',
-      headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
-      body: body === undefined ? undefined : JSON.stringify(body),
-      credentials: 'same-origin'
-    });
-    var data = {};
-    try { data = await res.json(); } catch (e) { /* non-JSON error */ }
+    if (location.protocol === 'file:') throw new Error(NO_SERVER);
+    var res;
+    try {
+      res = await fetch('/api/' + path, {
+        method: body === undefined ? 'GET' : 'POST',
+        headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+        credentials: 'same-origin'
+      });
+    } catch (e) {
+      throw new Error('Cannot reach the BIMO server. Check your internet connection and that the server is running.');
+    }
+    var data = null;
+    try { data = await res.json(); } catch (e) { /* non-JSON reply */ }
+    // A plain static host (no BIMO server) answers /api with an HTML or empty error page.
+    if (!data) throw new Error(NO_SERVER);
     if (res.status === 401 && path !== 'login') { state.user = null; show('login'); }
     if (!res.ok) {
       var err = new Error(data.error || 'Request failed (' + res.status + ')');
@@ -750,6 +760,11 @@
       goHome();
     } catch (e) {
       show('login');
+      if (/server/i.test(e.message)) {
+        var err = $('#login-error');
+        err.textContent = e.message;
+        err.hidden = false;
+      }
     }
   })();
 
