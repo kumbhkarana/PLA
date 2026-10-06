@@ -1,0 +1,12 @@
+# One-click deploy on Render (https://render.com): New → Blueprint → pick this repository.
+services:
+  - type: web
+    name: bimo
+    runtime: node
+    plan: free
+    buildCommand: echo "No build step"
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"

@@ -2,6 +2,10 @@
 window.BIMO_CONFIG = {
   appName: 'BIMO',
 
+  // Address of the running BIMO server, e.g. 'https://bimo.onrender.com'.
+  // A static copy of BIMO (such as GitHub Pages) can't log in on its own, so it forwards here.
+  serverUrl: '',
+
   // Product catalogue, as listed on the SUD Life product page.
   categories: [
     {

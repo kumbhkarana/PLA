@@ -1,5 +1,5 @@
 /* BIMO service worker — caches the app shell so it opens offline. */
-const CACHE = 'bimo-v2';
+const CACHE = 'bimo-v3';
 const ASSETS = [
   './', './index.html', './css/styles.css', './manifest.webmanifest', './assets/logo.svg',
   './js/config.js', './js/app.js', './vendor/html2canvas.min.js'

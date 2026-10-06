@@ -74,10 +74,20 @@
     window.scrollTo(0, 0);
   }
 
-  var NO_SERVER = 'BIMO server is not running. Open BIMO from its server address (start it with “npm start”) instead of opening the file directly.';
+  var STATIC_HOST = location.protocol === 'file:' || /\.github\.io$/i.test(location.hostname);
+  var NO_SERVER = /\.github\.io$/i.test(location.hostname)
+    ? 'This GitHub Pages link can’t log in by itself. BIMO needs its server, which isn’t set up yet (see “Deploy” in the README).'
+    : 'BIMO server is not running. Open BIMO from its server address (start it with “npm start”) instead of opening the file directly.';
+
+  // A static copy forwards to the real BIMO server once its address is configured.
+  if (STATIC_HOST && CFG.serverUrl) {
+    try {
+      if (new URL(CFG.serverUrl).origin !== location.origin) { location.replace(CFG.serverUrl); return; }
+    } catch (e) { /* bad URL in config — fall through to the normal message */ }
+  }
 
   async function api(path, body) {
-    if (location.protocol === 'file:') throw new Error(NO_SERVER);
+    if (STATIC_HOST) throw new Error(NO_SERVER);
     var res;
     try {
       res = await fetch('/api/' + path, {

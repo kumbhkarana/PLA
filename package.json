@@ -8,6 +8,6 @@
     "start": "node server/server.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

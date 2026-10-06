@@ -35,7 +35,7 @@ The browser can't call si.sudlife.in directly (it allows no cross-site requests 
 
 ## Run it
 
-> **BIMO must be opened through its server.** Opening `index.html` directly, or hosting the files on a static host such as GitHub Pages, will not work. Login and BI generation both run on the server, so the login screen will say "BIMO server is not running".
+> **BIMO must be opened through its server.** Opening `index.html` directly, or hosting only the files on GitHub Pages, will not work; see **Deploy** below. Login and BI generation both run on the server, so the login screen will say "BIMO server is not running".
 
 1. Install [Node.js](https://nodejs.org) (version 18 or newer).
 2. Download this repository and open a terminal in its folder.
@@ -52,6 +52,17 @@ To use it on a phone on the same Wi-Fi, open `http://<your-computer's-IP>:8080`.
 Deploy it on any Node host (Render, Railway, a VPS, Azure App Service, …) and serve it over HTTPS. On a phone, use **Add to Home Screen** to install it like an app.
 
 If your network routes outbound traffic through a proxy, start it with `NODE_USE_ENV_PROXY=1` (Node 22.21 or newer).
+
+## Deploy (so the link works on any phone)
+
+GitHub Pages can only host files, so on its own it can't log in or generate BIs. Host the BIMO server on a service that runs Node. **Render** is free and needs no setup beyond signing in:
+
+1. Go to **https://dashboard.render.com/blueprints** and sign in with GitHub.
+2. Click **New Blueprint Instance**, choose the **PLA** repository and the `claude/bimo-app-development-ojeha0` branch, then click **Apply**. Render reads `render.yaml` and starts BIMO.
+3. After a few minutes Render shows the app's address, e.g. `https://bimo-xxxx.onrender.com`. Open it and log in with `Karan` / `12345`.
+4. To keep using your GitHub Pages link, put that address in `js/config.js` → `serverUrl`. The Pages link will then forward agents to the server automatically.
+
+On Render's free plan the app goes to sleep after 15 minutes without use, so the first visit after that takes about a minute to load.
 
 ## Customise
 
